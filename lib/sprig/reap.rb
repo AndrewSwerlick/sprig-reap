@@ -42,6 +42,7 @@ module Sprig::Reap
     delegate :target_env,
              :classes,
              :ignored_attrs,
+             :ignored_dependencies,
              :logger,
              :omit_empty_attrs,
              to: :configuration

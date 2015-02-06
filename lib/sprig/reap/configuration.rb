@@ -29,6 +29,14 @@ module Sprig::Reap
       @ignored_attrs = parse_ignored_attrs_from(input)
     end
 
+    def ignored_dependencies
+      @ignored_dependencies ||= {}.tap{|h| h.default = []}
+    end
+
+    def ignored_dependencies=(input)
+      @ignored_dependencies = parse_ignored_dependencies_from_input(input)
+    end
+
     def logger
       @logger ||= Logger.new($stdout)
     end
@@ -78,7 +86,7 @@ module Sprig::Reap
 
     def validate_classes(classes)
       classes.each do |klass|
-        unless valid_classes.include? klass
+        unless valid_classes.include?(klass) || klass.kind_of?(ActiveRecord::Relation)
           raise ArgumentError, "Cannot create a seed file for #{klass} because it is not a subclass of ActiveRecord::Base."
         end
       end
@@ -92,6 +100,13 @@ module Sprig::Reap
       else
         input.map(&:to_s).map(&:strip)
       end
+    end
+
+    def parse_ignored_dependencies_from_input(input)
+      unless input.all? { |k,v| v.kind_of? Array }
+        raise ArgumentError, "Cannot parse ignored dependencies. Must be a hash of the form { klass => [relation, relation]}"
+      end
+      Hash[input.map { |k,v| [k.to_s, v.map{|r| r.to_s}] }]
     end
   end
 end

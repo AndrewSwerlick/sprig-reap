@@ -77,10 +77,25 @@ describe Sprig::Reap::Model do
 
       its(:dependencies) { should == [User] }
     end
+
+    context "when the model is initialized with an AR relation" do
+      subject { described_class.new(Post.where(title: "test")) }
+
+      its(:dependencies) { should == [User] }
+    end
+
+    context "when one of the belongs to relationships has been ignored" do
+      subject { described_class.new(Post) }
+      before do
+        Sprig::Reap.stub(:ignored_dependencies).and_return({ "post" => ["poster"] })
+      end
+
+      its(:dependencies){ should == [] }
+    end
   end
 
   describe "#associations" do
-    let(:association) { double('Association') }
+    let(:association) { double('Association', name: "user") }
 
     subject { described_class.new(Post) }
 
@@ -92,6 +107,18 @@ describe Sprig::Reap::Model do
       Sprig::Reap::Association.should_receive(:new).with(association)
 
       subject.associations
+    end
+
+    context "when the only association on the model has been ignored" do
+      before do
+        Sprig::Reap.stub(:ignored_dependencies).and_return({ "post" => ["user"] })
+      end
+
+      it "Creates no association objects" do
+        Sprig::Reap::Association.should_not_receive(:new).with(association)
+
+        subject.associations.count.should == 0
+      end
     end
   end
 
@@ -202,6 +229,16 @@ describe Sprig::Reap::Model do
 
       it "sets records to an empty array" do
         subject.records.should == []
+      end
+    end
+
+    context "when the initialized with an AR relation" do
+      let!(:post3) { Post.create(title: "test") }
+
+      subject {described_class.new(Post.where(title: "test"))}
+
+      it "only returns records in the relation" do
+        subject.records.count.should == 1
       end
     end
   end

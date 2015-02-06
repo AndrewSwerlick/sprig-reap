@@ -117,6 +117,14 @@ describe Sprig::Reap::Configuration do
         end
       end
     end
+
+    context "when given an array of ActiveRecord::Relations" do
+      it "sets the classes" do
+        subject.classes = [Comment.where(id: 1)]
+
+        subject.classes.should == [Comment.where(id: 1)]
+      end
+    end
   end
 
   describe "#ignored_attrs" do
@@ -142,6 +150,30 @@ describe Sprig::Reap::Configuration do
       before { subject.ignored_attrs = ' shaka, laka' }
 
       its(:ignored_attrs) { should == ['shaka', 'laka'] }
+    end
+  end
+
+  describe "#ignored_dependencies" do
+    context "from a fresh configuration" do
+      its(:ignored_dependencies) { should == { } }
+    end
+  end
+
+  describe "#ignored_dependencies=" do
+    context "when given nil" do
+      before { subject.ignored_attrs = nil }
+
+      its(:ignored_dependencies) { should == { } }
+    end
+
+    context "when given an hash of ignored_dependencies" do
+      before do
+        subject.ignored_dependencies = {
+          post: [:user]
+        }
+      end
+
+      its(:ignored_dependencies) { should == {"post" => ["user"] }.with_indifferent_access }
     end
   end
 
