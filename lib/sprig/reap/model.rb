@@ -17,10 +17,17 @@ module Sprig::Reap
     end
 
     attr_reader :klass
+    attr_reader :relation
     attr_writer :existing_sprig_ids
 
     def initialize(klass)
-      @klass = klass
+      if klass.kind_of?(ActiveModel::Relation)
+        @klass = klass.klass
+        @realtion = klass
+      else
+        @klass = klass
+        @relation = klass.all
+      end
     end
 
     def attributes
@@ -73,7 +80,7 @@ module Sprig::Reap
     end
 
     def records
-      @records ||= klass.all.map { |record| Record.new(record, self) }
+      @records ||= relation.all.map { |record| Record.new(record, self) }
     rescue => e
       log_error "Encountered an error when pulling the database records for #{to_s}:\r#{e.message}"
       []
@@ -82,9 +89,13 @@ module Sprig::Reap
     private
 
     def self.tsorted_classes(models)
-      models.reduce(TsortableHash.new) do |hash, model|
-        hash.merge(model.klass => model.dependencies)
-      end.tsort
+      begin
+        models.reduce(TsortableHash.new) do |hash, model|
+          hash.merge(model.klass => model.dependencies)
+        end.tsort
+      rescue KeyError(e)
+        log_error "Missing dependency "
+      end
     end
   end
 end
