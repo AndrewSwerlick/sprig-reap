@@ -84,7 +84,7 @@ describe Sprig::Reap::Model do
       its(:dependencies) { should == [User] }
     end
 
-    context "when one of the belongs to relationships has been ignored" do
+    context "when one of the belongs to dependencies has been ignored" do
       subject { described_class.new(Post) }
       before do
         Sprig::Reap.stub(:ignored_dependencies).with(Post).and_return([:poster])
