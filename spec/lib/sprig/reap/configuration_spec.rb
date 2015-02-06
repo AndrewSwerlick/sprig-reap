@@ -155,7 +155,9 @@ describe Sprig::Reap::Configuration do
 
   describe "#ignored_dependencies" do
     context "from a fresh configuration" do
-      its(:ignored_dependencies) { should == { } }
+      it "it should have no ignored dependencies for a class" do
+        subject.ignored_dependencies(Post).should == []
+      end
     end
   end
 
@@ -163,7 +165,9 @@ describe Sprig::Reap::Configuration do
     context "when given nil" do
       before { subject.ignored_attrs = nil }
 
-      its(:ignored_dependencies) { should == { } }
+      it "it should have no ignored dependencies for a class" do
+        subject.ignored_dependencies(Post).should == []
+      end
     end
 
     context "when given an hash of ignored_dependencies" do
@@ -173,7 +177,22 @@ describe Sprig::Reap::Configuration do
         }
       end
 
-      its(:ignored_dependencies) { should == {"post" => ["user"] }.with_indifferent_access }
+      it "it should have the correct ignored dependencies for a class" do
+        subject.ignored_dependencies(Post).should == [:user]
+      end
+    end
+
+    context "when given a hash with an all key" do
+      before do
+        subject.ignored_dependencies = {
+          all: [:created_by],
+          post: [:poster]
+        }
+      end
+
+      it "should include those dependencies with any class" do
+        subject.ignored_dependencies(Post).should == [:poster, :created_by]
+      end
     end
   end
 

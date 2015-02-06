@@ -29,8 +29,10 @@ module Sprig::Reap
       @ignored_attrs = parse_ignored_attrs_from(input)
     end
 
-    def ignored_dependencies
-      @ignored_dependencies ||= {}.tap{|h| h.default = []}
+    def ignored_dependencies(klass)
+      return [] unless @ignored_dependencies
+      key = klass.model_name.singular.to_sym
+      @ignored_dependencies[key] + @ignored_dependencies[:all]
     end
 
     def ignored_dependencies=(input)
@@ -106,7 +108,10 @@ module Sprig::Reap
       unless input.all? { |k,v| v.kind_of? Array }
         raise ArgumentError, "Cannot parse ignored dependencies. Must be a hash of the form { klass => [relation, relation]}"
       end
-      Hash[input.map { |k,v| [k.to_s, v.map{|r| r.to_s}] }]
+
+      h = input.symbolize_keys
+      h.default = []
+      h
     end
   end
 end

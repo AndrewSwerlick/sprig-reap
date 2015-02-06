@@ -87,7 +87,7 @@ describe Sprig::Reap::Model do
     context "when one of the belongs to relationships has been ignored" do
       subject { described_class.new(Post) }
       before do
-        Sprig::Reap.stub(:ignored_dependencies).and_return({ "post" => ["poster"] })
+        Sprig::Reap.stub(:ignored_dependencies).with(Post).and_return([:poster])
       end
 
       its(:dependencies){ should == [] }
@@ -107,18 +107,6 @@ describe Sprig::Reap::Model do
       Sprig::Reap::Association.should_receive(:new).with(association)
 
       subject.associations
-    end
-
-    context "when the only association on the model has been ignored" do
-      before do
-        Sprig::Reap.stub(:ignored_dependencies).and_return({ "post" => ["user"] })
-      end
-
-      it "Creates no association objects" do
-        Sprig::Reap::Association.should_not_receive(:new).with(association)
-
-        subject.associations.count.should == 0
-      end
     end
   end
 

@@ -28,17 +28,17 @@ module Sprig::Reap
     end
 
     def dependencies
-      @dependencies ||= associations.flat_map(&:dependencies)
+      @dependencies ||= associations
+        .reject do |association|
+          Sprig::Reap.ignored_dependencies(klass).include?(association.association.name)
+        end
+        .flat_map(&:dependencies)
     end
 
     def associations
-      @associations ||= klass.reflect_on_all_associations(:belongs_to)
-        .reject do |association|
-          Sprig::Reap.ignored_dependencies[klass.model_name.singular].include?(association.name.to_s)
-        end
-        .map do |association|
-          Association.new(association)
-        end
+      @associations ||= klass.reflect_on_all_associations(:belongs_to).map do |association|
+        Association.new(association)
+      end
     end
 
     def existing_sprig_ids
