@@ -206,7 +206,7 @@ describe Sprig::Reap::Model do
 
     context "when there's an error accessing the database table for a given model" do
       before do
-        Post.stub(:all).and_raise(StandardError, 'Oh snap')
+        Post.stub_chain(:where, :all).and_raise(StandardError, 'Oh snap')
       end
 
       it "logs an error message" do

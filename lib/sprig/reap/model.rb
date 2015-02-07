@@ -21,12 +21,12 @@ module Sprig::Reap
     attr_writer :existing_sprig_ids
 
     def initialize(klass)
-      if klass.kind_of?(ActiveModel::Relation)
+      if klass.kind_of?(ActiveRecord::Relation)
         @klass = klass.klass
-        @realtion = klass
+        @relation = klass
       else
         @klass = klass
-        @relation = klass.all
+        @relation = klass.where(nil)
       end
     end
 

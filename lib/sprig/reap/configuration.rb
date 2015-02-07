@@ -105,6 +105,8 @@ module Sprig::Reap
     end
 
     def parse_ignored_dependencies_from_input(input)
+      return {} unless input
+
       unless input.all? { |k,v| v.kind_of? Array }
         raise ArgumentError, "Cannot parse ignored dependencies. Must be a hash of the form { klass => [relation, relation]}"
       end

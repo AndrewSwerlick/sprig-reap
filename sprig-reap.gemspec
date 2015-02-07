@@ -20,6 +20,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec",            "~> 2.14.0"
   spec.add_development_dependency "database_cleaner", "~> 1.2.0"
   spec.add_development_dependency "pry"
+  spec.add_development_dependency "pry-byebug"
+  spec.add_development_dependency "pry-stack_explorer"
   spec.add_development_dependency "generator_spec"
   spec.add_development_dependency "carrierwave",      "~> 0.10.0"
 end
