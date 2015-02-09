@@ -115,6 +115,21 @@ describe Sprig::Reap::Record do
         }
       end
     end
+
+    context "when Sprig::Reap is configured to ignore some dependencies" do
+      before { Sprig::Reap.stub(:ignored_dependencies).with(Post).and_return([:poster]) }
+
+      it "does not include the user in the hash" do
+        subject.to_hash.should =={
+          "sprig_id"=>1,
+          "title"=>"Such Title",
+          "poster_id" => nil,
+          "content"=>"Very Content",
+          "published"=>true
+        }
+      end
+
+    end
   end
 
   describe "#sprig_id" do

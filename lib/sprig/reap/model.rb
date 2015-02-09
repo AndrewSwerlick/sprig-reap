@@ -57,6 +57,7 @@ module Sprig::Reap
     end
 
     def find(id)
+      
       records.find { |record| record.id == id }
     end
 

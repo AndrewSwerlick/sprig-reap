@@ -16,7 +16,10 @@ module Sprig::Reap
 
     def to_hash
       attributes.reduce({"sprig_id" => sprig_id}) do |hash, attr|
-        value = get_value_for(attr)
+        value = nil
+        unless ignored_dependency? attr
+          value = get_value_for(attr)
+        end
 
         if Sprig::Reap.omit_empty_attrs && value.nil?
           hash
@@ -46,6 +49,13 @@ module Sprig::Reap
 
     def dependency?(attr)
       attr.in? model.associations.map(&:foreign_key)
+    end
+
+    def ignored_dependency?(attr)
+      model.associations.select do |a|
+        Sprig::Reap.ignored_dependencies(model.klass).include?(a.association.name)
+      end
+      .map(&:foreign_key).include? attr
     end
 
     def klass_for(foreign_key)
