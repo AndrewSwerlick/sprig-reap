@@ -15,6 +15,16 @@ module Sprig::Reap
 
   class << self
     def reap(input = {})
+      setup(input)
+
+      log_debug "Reaping records from the database...\r"
+
+      Model.all.each { |model| SeedFile.new(model).write }
+
+      log_debug "Finished reaping!"
+    end
+
+    def setup(input = {})
       options = input.to_hash
 
       configure do |config|
@@ -24,12 +34,6 @@ module Sprig::Reap
         config.ignored_dependencies = options[:ignored_dependencies]  || options['IGNORED_DEPENDENCIES']
         config.omit_empty_attrs     = options[:omit_empty_attrs]      || options['OMIT_EMPTY_ATTRS']
       end
-
-      log_debug "Reaping records from the database...\r"
-
-      Model.all.each { |model| SeedFile.new(model).write }
-
-      log_debug "Finished reaping!"
     end
 
     def clear_config
