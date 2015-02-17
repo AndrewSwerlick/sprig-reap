@@ -57,7 +57,7 @@ module Sprig::Reap
     end
 
     def find(id)
-      
+
       records.find { |record| record.id == id }
     end
 
@@ -94,8 +94,8 @@ module Sprig::Reap
         models.reduce(TsortableHash.new) do |hash, model|
           hash.merge(model.klass => model.dependencies)
         end.tsort
-      rescue KeyError(e)
-        log_error "Missing dependency "
+      rescue KeyError
+        log_error "Missing dependency #{$!}"
       end
     end
   end
