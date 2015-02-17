@@ -40,6 +40,11 @@ module Sprig::Reap
       @@configuration = nil
     end
 
+    def reset
+      clear_config
+      Sprig::Reap::Model.clear
+    end
+
     private
 
     cattr_reader :configuration

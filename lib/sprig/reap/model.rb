@@ -12,6 +12,10 @@ module Sprig::Reap
       end
     end
 
+    def self.clear
+      @@all = nil
+    end
+
     def self.find(klass, id)
       all.find { |model| model.klass == klass }.find(id)
     end
