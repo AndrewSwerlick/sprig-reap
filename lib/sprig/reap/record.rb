@@ -75,7 +75,7 @@ module Sprig::Reap
     def sprig_record(klass, sprig_id)
       return if sprig_id.nil?
 
-      "<%= sprig_record(#{klass}, #{sprig_id}).id %>"
+      "<%= sprig_record(#{klass}, \"#{sprig_id}\").id %>"
     end
 
     def read_attribute(attr)
