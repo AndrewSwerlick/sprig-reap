@@ -43,7 +43,7 @@ module Sprig::Reap
 
         sprig_record(klass, sprig_id)
       else
-        read_attribute attr
+        escape_erb(read_attribute attr)
       end
     end
 
@@ -82,6 +82,12 @@ module Sprig::Reap
       file_attr = FileAttribute.new(record.send(attr))
 
       file_attr.file.try(:sprig_location) || record.read_attribute(attr)
+    end
+
+    def escape_erb(value)
+      return value unless value.kind_of? String
+
+      value.gsub(/<%([=].*)%>/, '<%%\1%>')
     end
   end
 end
